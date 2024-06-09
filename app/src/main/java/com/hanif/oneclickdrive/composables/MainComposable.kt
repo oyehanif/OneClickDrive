@@ -17,6 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -61,6 +62,10 @@ fun ThreeTextBoxes() {
     var maxNum by remember {
         mutableStateOf("")
     }
+    
+    var isError by remember {
+        mutableStateOf(false)
+    }
 
 
     Column(
@@ -95,12 +100,18 @@ fun ThreeTextBoxes() {
         Spacer(modifier = Modifier.height(16.dp))
         Button(
             onClick = {
-                val list1 = firstTextFiled.stringToSet()
-                val list2 = secondTextFiled.stringToSet()
-                val list3 = thirdTextFiled.stringToSet()
-                intersection = list1.intersect(list2).intersect(list3).joinToString(", ")
-                union = list1.union(list2).union(list3).joinToString(", ")
-                maxNum = (list1 + list2 + list3).maxOrNull().toString()
+                if (firstTextFiled.isNotEmpty() && secondTextFiled.isNotEmpty() && thirdTextFiled.isNotEmpty()) {
+                    val list1 = firstTextFiled.stringToSet()
+                    val list2 = secondTextFiled.stringToSet()
+                    val list3 = thirdTextFiled.stringToSet()
+                    intersection = list1.intersect(list2).intersect(list3).joinToString(", ")
+                    union = list1.union(list2).union(list3).joinToString(", ")
+                    maxNum = (list1 + list2 + list3).maxOrNull().toString()
+
+                    isError = false
+                }else{
+                    isError = true
+                }
             },
             modifier = Modifier.padding(vertical = 16.dp)
         ) {
@@ -108,8 +119,12 @@ fun ThreeTextBoxes() {
         }
 
         Spacer(modifier = Modifier.height(16.dp))
+        
+        AnimatedVisibility(visible = isError) {
+            Text(text = "Please Fill all the filed.", color = Color.Red)
+        }
 
-        AnimatedVisibility(visible =( intersection + union + maxNum).isNotEmpty()) {
+        AnimatedVisibility(visible = intersection.isNotEmpty() && union.isNotEmpty() && maxNum.isNotEmpty()) {
 
             Column(
                 modifier = Modifier.fillMaxWidth(),
